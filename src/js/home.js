@@ -79,3 +79,20 @@ const load = async () => {
 }
 
 load();
+
+const $actionContainer = document.querySelector('#action');
+const $horrorContainer = document.querySelector('#horror');
+const $animationContainer = document.querySelector('#animation');
+
+const $featuringContainer = document.querySelector('#featuring');
+const $form = document.querySelector('#form');
+const $home = document.querySelector('#home');
+
+// const $home = $('.home .list #item');
+const $modal = document.getElementById('modal');
+const $overlay = document.getElementById('overlay');
+const $hideModal = document.getElementById('hide-modal');
+
+const modalTitle = document.querySelector('h1');
+const modalImage = document.querySelector('img');
+const modalDescription = document.querySelector('p');
