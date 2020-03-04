@@ -76,11 +76,32 @@ const load = async () => {
   console.log(actionList.data.movies);
   console.log(horrorList);
   console.log(animationList);
+
+  const videoItemTemplate = (movie) => {
+    return (
+      `<div class="primaryPlaylistItem">
+      <div class="primaryPlaylistItem-image">
+      <img src="${movie.medium_cover_image}">
+      </div>
+      <h4 class="primaryPlaylistItem-title">
+      ${movie.title}
+      </h4>
+      </div>`
+      )
+    }
+    
+    const $actionContainer = document.querySelector('#action');
+  actionList.data.movies.map((movie) => {
+    const HTMLElement = videoItemTemplate(movie)
+    const html = document.implementation.createHTMLDocument();
+    html.body.innerHTML = HTMLElement;
+    $actionContainer.append(html.body.children[0])
+    console.log(HTMLElement)
+  })
 }
 
 load();
 
-const $actionContainer = document.querySelector('#action');
 const $horrorContainer = document.querySelector('#horror');
 const $animationContainer = document.querySelector('#animation');
 
@@ -96,3 +117,9 @@ const $hideModal = document.getElementById('hide-modal');
 const modalTitle = document.querySelector('h1');
 const modalImage = document.querySelector('img');
 const modalDescription = document.querySelector('p');
+
+
+
+
+// console.log(videoItemTemplate('../images/covers/bitcoin.jpg', 'Bitcoin'));
+
