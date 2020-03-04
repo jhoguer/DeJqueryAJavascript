@@ -71,8 +71,23 @@ const load = async () => {
   }
 
   const $form = document.querySelector('#form');
+  const $home = document.querySelector('#home');
+
+  const setAttributes = ($element, attributes) => {
+    for (const attribute in attributes) {
+      $element.setAttributes(attribute, attributes[attribute]);
+    }
+  }
+
   $form.addEventListener('submit', (event) => {
     event.preventDefault()
+    $home.classList.add('search-active');
+    const $loader = document.createElement('img');
+    setAttributes($loader, {
+      src: 'src/image/loader.gif',
+      height: 50,
+      width: 50,
+    })
   })
 
   const actionList = await getData('action');
@@ -103,7 +118,8 @@ const load = async () => {
 
     const addEventClick = ($element) => {
       $element.addEventListener('click', () => {
-        alert('click')
+        // alert('click')
+        showModal()
       })
     }
     
@@ -131,7 +147,6 @@ load();
 
 const $featuringContainer = document.querySelector('#featuring');
 
-const $home = document.querySelector('#home');
 
 // const $home = $('.home .list #item');
 const $modal = document.getElementById('modal');
@@ -141,6 +156,20 @@ const $hideModal = document.getElementById('hide-modal');
 const modalTitle = document.querySelector('h1');
 const modalImage = document.querySelector('img');
 const modalDescription = document.querySelector('p');
+
+const showModal= () => {
+  $overlay.classList.add('active');
+  $modal.style.animation = 'modalIn .8s forwards';
+}
+
+$hideModal.addEventListener('click', () => {
+  $overlay.classList.remove('active');
+  $modal.style.animation = 'modalOut .8s forwards';
+});
+// const hideModal = () => {
+//   $overlay.classList.remove('active');
+//   $modal.style.animation = 'modalOut .8s forwards';
+// }
 
 
 
