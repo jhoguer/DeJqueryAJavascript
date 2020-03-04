@@ -70,6 +70,11 @@ const load = async () => {
 
   }
 
+  const $form = document.querySelector('#form');
+  $form.addEventListener('submit', (event) => {
+    event.preventDefault()
+  })
+
   const actionList = await getData('action');
   const horrorList = await getData('horror');
   const animationList = await getData('animation');
@@ -89,24 +94,43 @@ const load = async () => {
       </div>`
       )
     }
+
+    const createTemplate = (HTMLElement) => {
+      const html = document.implementation.createHTMLDocument();
+      html.body.innerHTML = HTMLElement;
+      return html.body.children[0]
+    }
+
+    const addEventClick = ($element) => {
+      $element.addEventListener('click', () => {
+        alert('click')
+      })
+    }
     
-    const $actionContainer = document.querySelector('#action');
-  actionList.data.movies.map((movie) => {
-    const HTMLElement = videoItemTemplate(movie)
-    const html = document.implementation.createHTMLDocument();
-    html.body.innerHTML = HTMLElement;
-    $actionContainer.append(html.body.children[0])
-    console.log(HTMLElement)
-  })
+    const rederMovieList = (list, $container) => {
+      $container.children[0].remove();
+      list.map((movie) => {
+        const HTMLElement = videoItemTemplate(movie)
+        const movieElement = createTemplate(HTMLElement)
+        $container.append(movieElement)
+        addEventClick(movieElement)
+      })      
+    }
+    
+  const $actionContainer = document.querySelector('#action');
+  const $horrorContainer = document.querySelector('#drama');
+  const $animationContainer = document.querySelector('#animation');
+
+  rederMovieList(actionList.data.movies, $actionContainer);
+  rederMovieList(horrorList.data.movies, $horrorContainer);
+  rederMovieList(animationList.data.movies, $animationContainer);
 }
 
 load();
 
-const $horrorContainer = document.querySelector('#horror');
-const $animationContainer = document.querySelector('#animation');
 
 const $featuringContainer = document.querySelector('#featuring');
-const $form = document.querySelector('#form');
+
 const $home = document.querySelector('#home');
 
 // const $home = $('.home .list #item');
