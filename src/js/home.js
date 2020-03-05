@@ -114,13 +114,14 @@ const load = async (direccion) => {
 
     const data = new FormData($form);
 
-    const {
-      data: {
-        movies: pelis
-      }
-    } = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
+    // const {
+    //   data: {
+    //     movies: pelis,
+    //   }
+    // } = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
+    const pelis = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
  
-    const HTMLString = featuringTemplate(pelis[0])
+    const HTMLString = featuringTemplate(pelis.data.movies[0])
 
     $featuringContainer.innerHTML = HTMLString;
     
@@ -133,15 +134,15 @@ const load = async (direccion) => {
   console.log(horrorList);
   console.log(animationList);
 
-  const videoItemTemplate = (movie) => {
+  const videoItemTemplate = (movie, category) => {
     return (
-      `<div class="primaryPlaylistItem">
-      <div class="primaryPlaylistItem-image">
-      <img src="${movie.medium_cover_image}">
-      </div>
-      <h4 class="primaryPlaylistItem-title">
-      ${movie.title}
-      </h4>
+      `<div class="primaryPlaylistItem" data-id="${movie.id}" data-category=${category}>
+        <div class="primaryPlaylistItem-image">
+          <img src="${movie.medium_cover_image}">
+        </div>
+        <h4 class="primaryPlaylistItem-title">
+          ${movie.title}
+        </h4>
       </div>`
       )
     }
@@ -155,14 +156,14 @@ const load = async (direccion) => {
     const addEventClick = ($element) => {
       $element.addEventListener('click', () => {
         // alert('click')
-        showModal()
+        showModal($element)
       })
     }
     
-    const rederMovieList = (list, $container) => {
+    const rederMovieList = (list, $container, category) => {
       $container.children[0].remove();
       list.map((movie) => {
-        const HTMLElement = videoItemTemplate(movie)
+        const HTMLElement = videoItemTemplate(movie, category)
         const movieElement = createTemplate(HTMLElement)
         $container.append(movieElement)
         addEventClick(movieElement)
@@ -173,9 +174,9 @@ const load = async (direccion) => {
   const $horrorContainer = document.querySelector('#drama');
   const $animationContainer = document.querySelector('#animation');
 
-  rederMovieList(actionList.data.movies, $actionContainer);
-  rederMovieList(horrorList.data.movies, $horrorContainer);
-  rederMovieList(animationList.data.movies, $animationContainer);
+  rederMovieList(actionList.data.movies, $actionContainer, 'action');
+  rederMovieList(horrorList.data.movies, $horrorContainer, 'drama');
+  rederMovieList(animationList.data.movies, $animationContainer, 'animation');
 }
 
 load();
@@ -192,9 +193,11 @@ const modalTitle = document.querySelector('h1');
 const modalImage = document.querySelector('img');
 const modalDescription = document.querySelector('p');
 
-const showModal= () => {
+const showModal= ($element) => {
   $overlay.classList.add('active');
   $modal.style.animation = 'modalIn .8s forwards';
+  const id = $element.dataset.id;
+  const category = $element.dataset.category;
 }
 
 $hideModal.addEventListener('click', () => {
