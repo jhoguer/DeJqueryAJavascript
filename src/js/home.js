@@ -85,9 +85,9 @@ const load = async (direccion) => {
 
   const featuringTemplate = (peli) => {
     return (
-      `
-      <div class="featuring">
-        <div class="featuring-image">
+      `pokemon
+      <pokemon
+       pokemon>
           <img src="${peli.medium_cover_image}" width="70" height="100" alt="">
         </div>
         <div class="featuring-content">
@@ -113,11 +113,15 @@ const load = async (direccion) => {
     $featuringContainer.append($loader)
 
     const data = new FormData($form);
-    debugger
-    const peli = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
-    console.log('la peli' + peli);
-    const HTMLString = featuringTemplate(peli.data.movies[0])
-    debugger
+
+    const {
+      data: {
+        movies: pelis
+      }
+    } = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
+ 
+    const HTMLString = featuringTemplate(pelis[0])
+
     $featuringContainer.innerHTML = HTMLString;
     
   })
