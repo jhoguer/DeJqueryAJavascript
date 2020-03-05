@@ -61,9 +61,9 @@ Promise.race([
 
 // load();
 
-const load = async () => {
-  const getData = async (gender) => {
-    const url = `https://yts.mx/api/v2/list_movies.json?genre=${gender}`;
+const load = async (direccion) => {
+  const getData = async (direccion) => {
+    const url = direccion;
     const response = await fetch(url);
     const data = await response.json();
     return data
@@ -72,27 +72,59 @@ const load = async () => {
 
   const $form = document.querySelector('#form');
   const $home = document.querySelector('#home');
+  const $featuringContainer = document.getElementById('featuring');
+
 
   const setAttributes = ($element, attributes) => {
     for (const attribute in attributes) {
-      $element.setAttributes(attribute, attributes[attribute]);
+      $element.setAttribute(attribute, attributes[attribute]);
     }
   }
+  
+  const BASE_API = 'https://yts.mx/api/v2/';
 
-  $form.addEventListener('submit', (event) => {
+  const featuringTemplate = (peli) => {
+    return (
+      `
+      <div class="featuring">
+        <div class="featuring-image">
+          <img src="${peli.medium_cover_image}" width="70" height="100" alt="">
+        </div>
+        <div class="featuring-content">
+          <p class="featuring-title">Pelicula encontrada</p>
+          <p class="featuring-album">${peli.title}</p>
+        </div>
+      </div>
+      `
+    )
+  }
+
+  $form.addEventListener('submit', async (event) => {
     event.preventDefault()
+
+
     $home.classList.add('search-active');
     const $loader = document.createElement('img');
     setAttributes($loader, {
-      src: 'src/image/loader.gif',
+      src: 'src/images/loader.gif',
       height: 50,
       width: 50,
     })
+    $featuringContainer.append($loader)
+
+    const data = new FormData($form);
+    debugger
+    const peli = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
+    console.log('la peli' + peli);
+    const HTMLString = featuringTemplate(peli.data.movies[0])
+    debugger
+    $featuringContainer.innerHTML = HTMLString;
+    
   })
 
-  const actionList = await getData('action');
-  const horrorList = await getData('horror');
-  const animationList = await getData('animation');
+  const actionList = await getData(`${BASE_API}list_movies.json?genre=action`);
+  const horrorList = await getData(`${BASE_API}list_movies.json?genre=horror`);
+  const animationList = await getData(`${BASE_API}list_movies.json?genre=animation`);
   console.log(actionList.data.movies);
   console.log(horrorList);
   console.log(animationList);
@@ -145,7 +177,6 @@ const load = async () => {
 load();
 
 
-const $featuringContainer = document.querySelector('#featuring');
 
 
 // const $home = $('.home .list #item');
