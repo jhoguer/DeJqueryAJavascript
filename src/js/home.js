@@ -127,10 +127,10 @@ const load = async (direccion) => {
     
   })
 
-  const actionList = await getData(`${BASE_API}list_movies.json?genre=action`);
-  const horrorList = await getData(`${BASE_API}list_movies.json?genre=horror`);
-  const animationList = await getData(`${BASE_API}list_movies.json?genre=animation`);
-  console.log(actionList.data.movies);
+  const { data: { movies: actionList } } = await getData(`${BASE_API}list_movies.json?genre=action`);
+  const { data: { movies: horrorList } } = await getData(`${BASE_API}list_movies.json?genre=horror`);
+  const { data: { movies: animationList } } = await getData(`${BASE_API}list_movies.json?genre=animation`);
+  console.log(actionList);
   console.log(horrorList);
   console.log(animationList);
 
@@ -174,9 +174,54 @@ const load = async (direccion) => {
   const $horrorContainer = document.querySelector('#drama');
   const $animationContainer = document.querySelector('#animation');
 
-  rederMovieList(actionList.data.movies, $actionContainer, 'action');
-  rederMovieList(horrorList.data.movies, $horrorContainer, 'drama');
-  rederMovieList(animationList.data.movies, $animationContainer, 'animation');
+  rederMovieList(actionList, $actionContainer, 'action');
+  rederMovieList(horrorList, $horrorContainer, 'drama');
+  rederMovieList(animationList, $animationContainer, 'animation');
+
+
+  // const $home = $('.home .list #item');
+const $modal = document.getElementById('modal');
+const $overlay = document.getElementById('overlay');
+const $hideModal = document.getElementById('hide-modal');
+
+const modalTitle = $modal.querySelector('h1');
+const modalImage = $modal.querySelector('img');
+const modalDescription = $modal.querySelector('p');
+
+const findById = (list, id) => {
+  return list.find((movie) => movie.id === parseInt(id, 10))
+}
+
+const findMovie = (id, category) => {
+  switch (category) {
+    case 'action' : {
+      return findById(actionList, id)
+    }
+    case 'drama' : {
+      return findById(horrorList, id)
+    }
+    default: {
+      return findById(animationList, id)
+    }
+  }
+}
+
+const showModal= ($element) => {
+  $overlay.classList.add('active');
+  $modal.style.animation = 'modalIn .8s forwards';
+  const id = $element.dataset.id;
+  const category = $element.dataset.category;
+  const data = findMovie(id, category)
+
+  modalTitle.textContent = data.title;
+  modalImage.setAttribute('src', data.medium_cover_image);
+  modalDescription.textContent = data.description_full;
+}
+
+$hideModal.addEventListener('click', () => {
+  $overlay.classList.remove('active');
+  $modal.style.animation = 'modalOut .8s forwards';
+});
 }
 
 load();
@@ -184,26 +229,7 @@ load();
 
 
 
-// const $home = $('.home .list #item');
-const $modal = document.getElementById('modal');
-const $overlay = document.getElementById('overlay');
-const $hideModal = document.getElementById('hide-modal');
 
-const modalTitle = document.querySelector('h1');
-const modalImage = document.querySelector('img');
-const modalDescription = document.querySelector('p');
-
-const showModal= ($element) => {
-  $overlay.classList.add('active');
-  $modal.style.animation = 'modalIn .8s forwards';
-  const id = $element.dataset.id;
-  const category = $element.dataset.category;
-}
-
-$hideModal.addEventListener('click', () => {
-  $overlay.classList.remove('active');
-  $modal.style.animation = 'modalOut .8s forwards';
-});
 // const hideModal = () => {
 //   $overlay.classList.remove('active');
 //   $modal.style.animation = 'modalOut .8s forwards';
