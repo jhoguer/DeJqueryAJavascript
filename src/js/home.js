@@ -64,9 +64,18 @@ Promise.race([
 const load = async (direccion) => {
   const getData = async (direccion) => {
     const url = direccion;
-    const response = await fetch(url);
-    const data = await response.json();
-    return data
+      try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.data.movie_count > 0) {
+        return data
+      } else {
+
+      }
+    } catch (err) {
+      alert('Fallo la api')
+    }
+    
 
   }
 
@@ -113,26 +122,27 @@ const load = async (direccion) => {
     $featuringContainer.append($loader)
 
     const data = new FormData($form);
-
-    // const {
-    //   data: {
-    //     movies: pelis,
-    //   }
-    // } = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
-    const pelis = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
- 
-    const HTMLString = featuringTemplate(pelis.data.movies[0])
-
-    $featuringContainer.innerHTML = HTMLString;
+    try {
+      const {
+        data: {
+          movies: pelis,
+        }
+      } = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
+      // const pelis = await getData(`${BASE_API}list_movies.json?limit=&query_term=${data.get('name')}`)
+   
+      const HTMLString = featuringTemplate(pelis[0])  
+      $featuringContainer.innerHTML = HTMLString;
+      
+    } catch (err) {
+      
+      alert(err.message);
+      $loader.remove();
+      $home.classList.remove('search-active');
+    }
     
   })
 
-  const { data: { movies: actionList } } = await getData(`${BASE_API}list_movies.json?genre=action`);
-  const { data: { movies: horrorList } } = await getData(`${BASE_API}list_movies.json?genre=horror`);
-  const { data: { movies: animationList } } = await getData(`${BASE_API}list_movies.json?genre=animation`);
-  console.log(actionList);
-  console.log(horrorList);
-  console.log(animationList);
+  
 
   const videoItemTemplate = (movie, category) => {
     return (
@@ -165,18 +175,45 @@ const load = async (direccion) => {
       list.map((movie) => {
         const HTMLElement = videoItemTemplate(movie, category)
         const movieElement = createTemplate(HTMLElement)
-        $container.append(movieElement)
+        $container.append(movieElement);
+        const image = movieElement.querySelector('img');
+        image.addEventListener('load', () => {
+          event.srcElement.classList.add('fadeIn');
+        })
         addEventClick(movieElement)
       })      
     }
-    
-  const $actionContainer = document.querySelector('#action');
-  const $horrorContainer = document.querySelector('#drama');
-  const $animationContainer = document.querySelector('#animation');
 
-  rederMovieList(actionList, $actionContainer, 'action');
-  rederMovieList(horrorList, $horrorContainer, 'drama');
-  rederMovieList(animationList, $animationContainer, 'animation');
+    const cacheExist = async (category) => {
+      const listName = `${category}List`
+      const cacheList = window.localStorage.getItem(listName);
+
+      if (cacheList) {
+        return JSON.parse(cacheList);
+      }
+        const { data: { movies: data } } = await getData(`${BASE_API}list_movies.json?genre=${category}`);
+        window.localStorage.setItem(listName, JSON.stringify(data));
+        return data;
+
+    }
+
+    // const { data: { movies: actionList } } = await getData(`${BASE_API}list_movies.json?genre=action`);
+    const actionList = await cacheExist('action');
+    const $actionContainer = document.querySelector('#action');
+    rederMovieList(actionList, $actionContainer, 'action');
+
+    const horrorList = await cacheExist('horror');
+    const $horrorContainer = document.querySelector('#drama');
+    rederMovieList(horrorList, $horrorContainer, 'drama');
+
+    const animationList = await cacheExist('animation');
+    const $animationContainer = document.querySelector('#animation');
+    rederMovieList(animationList, $animationContainer, 'animation');
+
+    
+
+
+
 
 
   // const $home = $('.home .list #item');
